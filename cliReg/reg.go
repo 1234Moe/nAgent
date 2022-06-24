@@ -58,7 +58,7 @@ func Commands() []*cli.Command {
 				&cli.IntFlag{
 					Name:    "thread",
 					Aliases: []string{"t"},
-					Value:   10,
+					Value:   5,
 					Usage:   "Set download thread number",
 				},
 				&cli.BoolFlag{

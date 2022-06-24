@@ -11,6 +11,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const webSiteUrl = "https://nhentai.net"
@@ -28,6 +29,7 @@ func Download(comicDownload structType.ComicDownload) (err error) {
 
 	htmlCollector := colly.NewCollector()
 	imageCollector := colly.NewCollector(colly.AllowURLRevisit())
+	imageCollector.SetRequestTimeout(time.Second * 15)
 	imageDownloadQueue, _ := queue.New(comicDownload.ThreadCount, &queue.InMemoryQueueStorage{MaxSize: 10000})
 	retryImageDownloadList := make([]string, 0)
 	if comicDownload.ProxyUrl != "" {
@@ -66,8 +68,7 @@ func Download(comicDownload structType.ComicDownload) (err error) {
 		return errors.New("create comic dir failed")
 	}
 	imageCollector.OnError(func(r *colly.Response, err error) {
-		nowDownloadIndex++
-		fmt.Println(err)
+		fmt.Printf("error downloading image %s\n", r.Request.URL)
 		retryImageDownloadList = append(retryImageDownloadList, r.Request.URL.String())
 	})
 	imageCollector.OnResponse(func(r *colly.Response) {
